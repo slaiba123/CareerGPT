@@ -4,12 +4,11 @@ from werkzeug.utils import secure_filename
 import PyPDF2
 from langchain_core.prompts import PromptTemplate
 from langchain_classic.chains import LLMChain, RetrievalQA
-from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
-
+from langchain_community.embeddings import FastEmbedEmbeddings
 load_dotenv()
 # ── Text splitter ──────────────────────────────────────────────────────────────
 text_splitter = CharacterTextSplitter(
@@ -20,7 +19,7 @@ text_splitter = CharacterTextSplitter(
 )
 
 # ── Embeddings ─────────────────────────────────────────────────────────────────
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+embeddings = FastEmbedEmbeddings()
 # ── Gemini LLM ─────────────────────────────────────────────────────────────────
 llm = ChatGroq(
     model="llama-3.1-8b-instant",
