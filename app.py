@@ -8,7 +8,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
 load_dotenv()
 # ── Text splitter ──────────────────────────────────────────────────────────────
 text_splitter = CharacterTextSplitter(
@@ -19,8 +19,10 @@ text_splitter = CharacterTextSplitter(
 )
 
 # ── Embeddings ─────────────────────────────────────────────────────────────────
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-# ── Gemini LLM ─────────────────────────────────────────────────────────────────
+embeddings = HuggingFaceInferenceAPIEmbeddings(
+    api_key=os.getenv("HF_TOKEN"),
+    model_name="sentence-transformers/all-MiniLM-L6-v2"
+)# ── Gemini LLM ─────────────────────────────────────────────────────────────────
 llm = ChatGroq(
     model="llama-3.1-8b-instant",
     api_key=os.getenv("GROQ_API_KEY"))
@@ -149,4 +151,5 @@ def ask_query():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
+    print(port)
     app.run(host="0.0.0.0", port=port)
