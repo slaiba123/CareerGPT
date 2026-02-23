@@ -1,0 +1,5 @@
+.env
+ai_career_env/
+__pycache__/
+uploads/
+vector_index/
