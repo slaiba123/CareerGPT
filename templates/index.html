@@ -3,77 +3,494 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume Evaluation</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/framer-motion/dist/framer-motion.js"></script>
+    <title>CareerGPT — AI Career Coach</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --black: #0a0a0a;
+            --white: #f5f3ee;
+            --accent: #c8f74a;
+            --accent2: #ff5c3a;
+            --gray: #6b6b6b;
+            --card-bg: #111111;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--black);
+            color: var(--white);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Noise texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.4;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 3rem;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 50;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.4rem;
+            letter-spacing: -0.02em;
+            color: var(--white);
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .nav-tag {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--gray);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+        }
+
+        main {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 8rem 3rem 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 4rem;
+        }
+
+        .left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(200, 247, 74, 0.1);
+            border: 1px solid rgba(200, 247, 74, 0.3);
+            color: var(--accent);
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            width: fit-content;
+        }
+
+        .badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: clamp(2.8rem, 5vw, 4.5rem);
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            color: var(--white);
+        }
+
+        h1 .highlight {
+            color: var(--accent);
+            position: relative;
+            display: inline-block;
+        }
+
+        h1 .strike {
+            position: relative;
+            color: var(--gray);
+        }
+
+        h1 .strike::after {
+            content: '';
+            position: absolute;
+            left: 0; right: 0;
+            top: 50%;
+            height: 3px;
+            background: var(--accent2);
+            transform: rotate(-2deg);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--gray);
+            line-height: 1.7;
+            max-width: 480px;
+            font-weight: 300;
+        }
+
+        .upload-area {
+            background: var(--card-bg);
+            border: 1px dashed rgba(255,255,255,0.15);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: border-color 0.3s, background 0.3s;
+            max-width: 480px;
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent);
+            background: rgba(200, 247, 74, 0.03);
+        }
+
+        .upload-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--gray);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: var(--white);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        input[type="file"]:hover {
+            border-color: rgba(200, 247, 74, 0.4);
+        }
+
+        input[type="file"]::-webkit-file-upload-button {
+            background: rgba(200, 247, 74, 0.1);
+            border: 1px solid rgba(200, 247, 74, 0.3);
+            color: var(--accent);
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-right: 1rem;
+            transition: background 0.2s;
+        }
+
+        input[type="file"]::-webkit-file-upload-button:hover {
+            background: rgba(200, 247, 74, 0.2);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: var(--accent);
+            color: var(--black);
+            border: none;
+            border-radius: 10px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(200, 247, 74, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn::after {
+            content: ' →';
+        }
+
+        .stats {
+            display: flex;
+            gap: 2rem;
+            padding-top: 0.5rem;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .stat-num {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: var(--white);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        /* Right Side */
+        .right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            opacity: 0;
+            transform: translateX(30px);
+            animation: fadeLeft 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            transition: border-color 0.3s, transform 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(255,255,255,0.15);
+            transform: translateX(4px);
+        }
+
+        .feature-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .icon-green { background: rgba(200, 247, 74, 0.12); }
+        .icon-red { background: rgba(255, 92, 58, 0.12); }
+        .icon-blue { background: rgba(100, 180, 255, 0.12); }
+
+        .feature-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--white);
+            margin-bottom: 0.3rem;
+        }
+
+        .feature-desc {
+            font-size: 0.85rem;
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        .big-card {
+            background: linear-gradient(135deg, rgba(200, 247, 74, 0.08), rgba(200, 247, 74, 0.02));
+            border: 1px solid rgba(200, 247, 74, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .big-card::before {
+            content: '"';
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            font-family: 'Syne', sans-serif;
+            font-size: 8rem;
+            color: rgba(200, 247, 74, 0.08);
+            line-height: 1;
+        }
+
+        .big-card-text {
+            font-size: 1rem;
+            color: rgba(245, 243, 238, 0.8);
+            line-height: 1.7;
+            font-style: italic;
+            font-weight: 300;
+            margin-bottom: 1rem;
+        }
+
+        .big-card-author {
+            font-size: 0.8rem;
+            color: var(--accent);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeLeft {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Loading state */
+        .submit-btn.loading {
+            background: rgba(200, 247, 74, 0.5);
+            pointer-events: none;
+        }
+
+        .submit-btn.loading::after {
+            content: ' ⟳';
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 900px) {
+            main {
+                flex-direction: column;
+                padding: 7rem 1.5rem 3rem;
+            }
+            nav { padding: 1.2rem 1.5rem; }
+            .right { display: none; }
+        }
+    </style>
 </head>
-<body class="min-h-screen bg-white ">
-    <main class=" max-w-7xl mx-auto min-h-screen flex  items-center  ">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-4 lg:p-8">
-            <!-- Left Content -->
-            <div class="flex flex-col justify-start space-y-6" id="content">
-                
-                <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
-                    <span class="underline underline-offset-4 decoration-blue-500 ">Resume</span> Evaluation & Expert Career Coaching
-                </h1>
-                <p class="text-lg text-gray-600 max-w-xl">
-                    Transform your career journey with professional guidance. Upload your resume for expert evaluation and personalized coaching.
+<body>
+    <nav>
+        <div class="logo">Career<span>GPT</span></div>
+        <div class="nav-tag">AI Powered ✦ Free</div>
+    </nav>
+
+    <main>
+        <div class="left">
+            <div class="badge">Now powered by Groq AI</div>
+
+            <h1>
+                Stop getting<br>
+                <span class="strike">ignored</span><br>
+                <span class="highlight">get hired.</span>
+            </h1>
+
+            <p class="subtitle">
+                Upload your resume. Our AI tears it apart, finds every weakness, and tells you exactly what to fix. No sugarcoating — just results.
+            </p>
+
+            <form action="/upload" method="POST" enctype="multipart/form-data" class="upload-area" id="uploadForm">
+                <span class="upload-label">Upload your resume</span>
+                <div class="file-input-wrapper">
+                    <input type="file" name="file" accept=".pdf" required id="fileInput">
+                </div>
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Analyze My Resume
+                </button>
+            </form>
+
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-num">AI</span>
+                    <span class="stat-label">Powered</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-num">30s</span>
+                    <span class="stat-label">Analysis Time</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-num">Free</span>
+                    <span class="stat-label">No Credit Card</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="right">
+            <div class="big-card">
+                <p class="big-card-text">
+                    Your resume has been lying to you. It's not about what you did — it's about how you said it. CareerGPT fixes both.
                 </p>
-                <form action="/upload" method="POST" enctype="multipart/form-data" class="space-y-4">
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">
-                            Choose a PDF file:
-                        </label>
-                        <div class="flex items-center space-x-3">
-                            <input 
-                                type="file" 
-                                name="file" 
-                                accept=".pdf" 
-                                required
-                                class="block w-full text-sm text-gray-500 border-2 max-w-lg py-2 rounded-md
-                                    file:mr-4 file:py-2 file:px-4
-                                    file:rounded-full file:border-0
-                                    file:text-sm file:font-semibold file:bg-slate-100
-                                    file:bg-gray-50 file:text-gray-700   file:drop-shadow-sm
-                                    hover:file:bg-gray-100"
-                                    
-                            >
-                        </div>
-                    </div>
-                    <button 
-                        type="submit"
-                        class="inline-flex items-center px-6 py-3 border border-transparent 
-                               text-base font-medium rounded-md text-white bg-blue-600 
-                               hover:bg-blue-700 focus:outline-none focus:ring-2 
-                               focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                    >
-                        Submit Resume
-                    </button>
-                </form>
+                <div class="big-card-author">CareerGPT ✦ AI Career Coach</div>
             </div>
 
-            <!-- Right Image -->
-            <div class="hidden lg:flex relative justify-start items-center">
-                <img 
-                    src="https://res.cloudinary.com/dtsuvx8dz/image/upload/v1714291460/nfbn9ltv8fugtboqcxw0.gif" 
-                    alt="Career coaching illustration" 
-                    class="w- h- object-cover rounded-xl"
-                >
-                <div class="absolute inset-0 "></div>
+            <div class="feature-card">
+                <div class="feature-icon icon-green">📋</div>
+                <div>
+                    <div class="feature-title">Resume Analysis</div>
+                    <div class="feature-desc">Deep AI analysis of your skills, experience, and career trajectory with actionable feedback.</div>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon icon-red">🎯</div>
+                <div>
+                    <div class="feature-title">Weakness Detection</div>
+                    <div class="feature-desc">Identifies exactly what recruiters flag — and how to fix it before your next application.</div>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon icon-blue">💬</div>
+                <div>
+                    <div class="feature-title">Ask Anything</div>
+                    <div class="feature-desc">Chat with your resume. Ask career questions and get personalized coaching 24/7.</div>
+                </div>
             </div>
         </div>
     </main>
 
     <script>
-        // Simple animation with Framer Motion
-        const content = document.getElementById('content');
-        content.style.opacity = '0';
-        content.style.transform = 'translateY(20px)';
-
-        window.addEventListener('load', () => {
-            content.style.transition = 'all 0.8s ease-out';
-            content.style.opacity = '1';
-            content.style.transform = 'translateY(0)';
+        document.getElementById('uploadForm').addEventListener('submit', function() {
+            const btn = document.getElementById('submitBtn');
+            btn.classList.add('loading');
+            btn.textContent = 'Analyzing';
         });
     </script>
 </body>
