@@ -1,4 +1,4 @@
-# CareerGPT 🚀
+# CareerGPT 🤖
 ### *"Your resume has been lying to you. CareerGPT won't."*
 
 An AI-powered career coaching web app that analyzes your resume, gives brutally honest feedback, and lets you ask career questions — all in one place.
