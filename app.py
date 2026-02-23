@@ -8,7 +8,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
-from langchain_community.embeddings import FastEmbedEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 load_dotenv()
 # ── Text splitter ──────────────────────────────────────────────────────────────
 text_splitter = CharacterTextSplitter(
@@ -19,7 +19,7 @@ text_splitter = CharacterTextSplitter(
 )
 
 # ── Embeddings ─────────────────────────────────────────────────────────────────
-embeddings = FastEmbedEmbeddings()
+embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 # ── Gemini LLM ─────────────────────────────────────────────────────────────────
 llm = ChatGroq(
     model="llama-3.1-8b-instant",
