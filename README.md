@@ -54,6 +54,7 @@ pip install -r requirements.txt
 Create a `.env` file in the root directory:
 ```
 GROQ_API_KEY=your_groq_api_key_here
+HF_TOKEN=hugging face token(read token only)
 ```
 
 Get a free Groq API key at [console.groq.com](https://console.groq.com)
