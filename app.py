@@ -8,7 +8,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
-from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
+from langchain_huggingface import HuggingFaceEndpointEmbeddings
 load_dotenv()
 # ── Text splitter ──────────────────────────────────────────────────────────────
 text_splitter = CharacterTextSplitter(
@@ -19,10 +19,11 @@ text_splitter = CharacterTextSplitter(
 )
 
 # ── Embeddings ─────────────────────────────────────────────────────────────────
-embeddings = HuggingFaceInferenceAPIEmbeddings(
-    api_key=os.getenv("HF_TOKEN"),
-    model_name="sentence-transformers/all-MiniLM-L6-v2"
-)# ── Gemini LLM ─────────────────────────────────────────────────────────────────
+embeddings = HuggingFaceEndpointEmbeddings(
+    model="sentence-transformers/all-MiniLM-L6-v2",
+    huggingfacehub_api_token=os.getenv("HF_TOKEN")
+)
+# ── Gemini LLM ─────────────────────────────────────────────────────────────────
 llm = ChatGroq(
     model="llama-3.1-8b-instant",
     api_key=os.getenv("GROQ_API_KEY"))
