@@ -110,8 +110,8 @@ This app is deployed on **Render**. To deploy your own instance:
 1. Push your code to GitHub
 2. Go to [render.com](https://render.com) → New → Web Service
 3. Connect your GitHub repo
-4. Set Start Command: `gunicorn app:app`
-5. Add environment variable: `GROQ_API_KEY`
+4. Set Start Command: `gunicorn app:app `
+5. Add environment variables: `GROQ_API_KEY`,`HF_TOKEN`
 6. Deploy ✅
 
 > **Note:** Render's free tier has an ephemeral filesystem — uploaded files and the FAISS index reset on each redeploy. This is fine for demos.
@@ -123,6 +123,7 @@ This app is deployed on **Render**. To deploy your own instance:
 | Variable | Description |
 |---|---|
 | `GROQ_API_KEY` | Your Groq API key from console.groq.com |
+| `HF_TOKEN` | Your Huggingface token |
 
 ---
 
